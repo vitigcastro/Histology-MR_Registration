@@ -19,10 +19,14 @@ function varargout = Register_PM_MRI(varargin)
 %      instance to run (singleton)".
 %
 % See also: GUIDE, GUIDATA, GUIHANDLES
+%
+% Created by:	Victor Gonzalez Castro
+% Funded by:    Row Fogo Charitable Trust
+% 
 
     % Edit the above text to modify the response to help Register_PM_MRI
 
-    % Last Modified by GUIDE v2.5 02-May-2016 11:11:52
+    % Last Modified by GUIDE v2.5 07-Jun-2016 10:57:37
 
     % Begin initialization code - DO NOT EDIT
     gui_Singleton = 1;
@@ -89,6 +93,9 @@ function Register_PM_MRI_OpeningFcn(hObject, eventdata, handles, varargin)
     set(handles.buttonT1w, 'Visible', 'off');
     set(handles.buttonT2w, 'Visible', 'off');
     set(handles.buttonT2star, 'Visible', 'off');
+    
+    % Set string of the text panel above the histology panel
+    set(handles.text5, 'String', '');
     
     % Set properties of uitables
     set(handles.uitablePointsMRI, 'ColumnEditable', [false, false]);
@@ -205,15 +212,22 @@ function buttonFLAIR_Callback(hObject, eventdata, handles)
         data.data.MRIImage{3,valueFLAIR} = maskCrop;
         guidata(handles.axes1, data);
         
-        %Show in the axis
+        %%%%%%%%%%%%%%%%%%%%%%%%%%
+        %%%% SHOW IN THE AXIS %%%%
+        %%%%%%%%%%%%%%%%%%%%%%%%%%
         % Next, set your image display axes as the current axes:
         axes(handles.axes1);
         
         % Get axes1 tag
         tag = get(handles.axes1, 'Tag');
         
-        % Display image in axes1
+%         % Display image in axes1 using bicubic interpolation
         hFLAIR = imshow(data.data.MRIImage{2,valueFLAIR},[]);
+%         resizePos = get(handles.axes1, 'Position');
+%         scaleRes = resizePos(3)/max(size(data.data.MRIImage{2,valueFLAIR})); % Axis is squared
+%         %imageRes = imresize(data.data.MRIImage{2,valueFLAIR}, [resizePos(4) resizePos(3)]);
+%         imageRes = imresize(data.data.MRIImage{2,valueFLAIR}, scaleRes, 'bicubic');
+%         hFLAIR = imshow(imageRes);
         
         % Set again the properties lost in axes1
         set(handles.axes1, 'Tag', tag);
@@ -280,16 +294,23 @@ function buttonT1w_Callback(hObject, eventdata, handles)
         data.data.MRIImage{3, valueT1w} = maskCrop;
         guidata(handles.axes1, data);
         
-        %Show in the axis
+        %%%%%%%%%%%%%%%%%%%%%%%%%%
+        %%%% SHOW IN THE AXIS %%%%
+        %%%%%%%%%%%%%%%%%%%%%%%%%%        
         % Next, set your image display axes as the current axes:
         axes(handles.axes1);
         
         % Get axes1 tag
         tag = get(handles.axes1, 'Tag');
         
-        % Display image in axes1
+        % Display image in axes1 using bicubic interpolation
         hT1w = imshow(data.data.MRIImage{2,valueT1w},[]);
-        
+%         resizePos = get(handles.axes1, 'Position');
+%         scaleRes = resizePos(3)/max(size(data.data.MRIImage{2,valueT1w})); % Axis is squared
+%         %imageRes = imresize(data.data.MRIImage{2,valueFLAIR}, [resizePos(4) resizePos(3)]);
+%         imageRes = imresize(data.data.MRIImage{2,valueT1w}, scaleRes, 'bicubic');
+%         hT1w = imshow(imageRes);
+
         % CHECK IF THERE ARE POINTS ALREADY SELECTED, AND SHOW THEM IF
         % NECESSARY
         selPointsMRI = data.data.tableCoordinatesMRI;
@@ -377,15 +398,22 @@ function buttonT2w_Callback(hObject, eventdata, handles)
         guidata(handles.axes1, data);
         
      
-        %Show in the axis
+        %%%%%%%%%%%%%%%%%%%%%%%%%%
+        %%%% SHOW IN THE AXIS %%%%
+        %%%%%%%%%%%%%%%%%%%%%%%%%%  
         % Next, set your image display axes as the current axes:
         axes(handles.axes1);
         
         % Get axes1 tag
         tag = get(handles.axes1, 'Tag');
         
-        % Display image in axes1
+        % Display image in axes1 using bicubic interpolation
         hT2w = imshow(data.data.MRIImage{2,valueT2w},[]);
+%         resizePos = get(handles.axes1, 'Position');
+%         scaleRes = resizePos(3)/max(size(data.data.MRIImage{2,valueT2w})); % Axis is squared
+%         %imageRes = imresize(data.data.MRIImage{2,valueFLAIR}, [resizePos(4) resizePos(3)]);
+%         imageRes = imresize(data.data.MRIImage{2,valueT2w}, scaleRes, 'bicubic');
+%         hT2w = imshow(imageRes);
         
         % CHECK IF THERE ARE POINTS ALREADY SELECTED, AND SHOW THEM IF
         % NECESSARY
@@ -473,8 +501,9 @@ function buttonT2star_Callback(hObject, eventdata, handles)
         data.data.MRIImage{3, valueT2star} = maskCrop;
         guidata(handles.axes1, data);
         
-
-        %Show in the axis
+        %%%%%%%%%%%%%%%%%%%%%%%%%%
+        %%%% SHOW IN THE AXIS %%%%
+        %%%%%%%%%%%%%%%%%%%%%%%%%%
         % Next, set your image display axes as the current axes:
         axes(handles.axes1);
         
@@ -483,6 +512,11 @@ function buttonT2star_Callback(hObject, eventdata, handles)
         
         % Display image in axes1
         hT2star = imshow(data.data.MRIImage{2,valueT2star},[]);
+%         resizePos = get(handles.axes1, 'Position');
+%         scaleRes = resizePos(3)/max(size(data.data.MRIImage{2,valueT2star})); % Axis is squared
+%         %imageRes = imresize(data.data.MRIImage{2,valueFLAIR}, [resizePos(4) resizePos(3)]);
+%         imageRes = imresize(data.data.MRIImage{2,valueT2star}, scaleRes, 'bicubic');
+%         hT2star = imshow(imageRes);
         
         % CHECK IF THERE ARE POINTS ALREADY SELECTED, AND SHOW THEM IF
         % NECESSARY
@@ -564,15 +598,22 @@ function pushbuttonHE_Callback(hObject, eventdata, handles)
         data.data.histologyImage{valueHistology, 3} = sizeHistol;
         guidata(handles.axes1, data);
         
-        %Show in the axis
+        %%%%%%%%%%%%%%%%%%%%%%%%%%
+        %%%% SHOW IN THE AXIS %%%%
+        %%%%%%%%%%%%%%%%%%%%%%%%%%
         % Next, set your image display axes as the current axes:
         axes(handles.axes2);
         
         % Get axes2 tag
         tag = get(handles.axes2, 'Tag');
         
-        % Display image in axes1
+        % Display image in axes1, using bicubic interpolation
         hHistology = imshow(data.data.histologyImage{valueHistology},[]);
+%         resizePos = get(handles.axes2, 'Position');
+%         scaleRes = resizePos(3)/max(size(data.data.histologyImage{valueHistology})); % Axis is squared
+%         %imageRes = imresize(data.data.MRIImage{2,valueFLAIR}, [resizePos(4) resizePos(3)]);
+%         imageRes = imresize(data.data.histologyImage{valueHistology}, scaleRes, 'bicubic');
+%         hHistology = imshow(imageRes);
         
         % Set again the properties lost in axes1
         set(handles.axes2, 'Tag', tag);
@@ -582,8 +623,18 @@ function pushbuttonHE_Callback(hObject, eventdata, handles)
         % ACTIVATE THE CORRESPONDING RADIOBUTTON
         set(handles.rbHE, 'Value', 1);
         
+        % Change text above the histology image panel, indicating the user
+        % to select a few points (needed to make an affine registration to 
+        % the image)
+        set(handles.text5, 'String', 'Select 4-5 points in both images');
+        
         % IF THE IMAGE IS WELL READ, MAKE THIS BUTTON INVISIBLE
 %         set(handles.buttonMTIse02, 'Visible', 'off');
+
+        set(handles.pushbuttonAffRegistration, 'Enable', 'on');
+        set(handles.pushbuttonRegistration, 'Enable', 'off');
+        set(handles.radiobutton18, 'Enable', 'on');
+        set(handles.radiobutton19, 'Enable', 'on');
         
     catch
         errordlg('Choose a JPEG image', 'Error reading the image');
@@ -783,8 +834,13 @@ function uibuttongroup1_SelectionChangedFcn(hObject, eventdata, handles)
         % Get axes1 tag
         tag = get(handles.axes1, 'Tag');
         
-        % Finally, display the image:
+        % Finally, display the image using bicubic interpolation
         hMRI = imshow(dataHandles.data.MRIImage{2,newValMRI},[]);
+%         resizePos = get(handles.axes1, 'Position');
+%         scaleRes = resizePos(3)/max(size(dataHandles.data.MRIImage{2,newValMRI})); % Axis is squared
+%         %imageRes = imresize(data.data.MRIImage{2,valueFLAIR}, [resizePos(4) resizePos(3)]);
+%         imageRes = imresize(dataHandles.data.MRIImage{2,newValMRI}, scaleRes, 'bicubic');
+%         hMRI = imshow(imageRes);
         
         % CHECK IF THERE ARE POINTS ALREADY SELECTED, AND SHOW THEM IF
         % NECESSARY
@@ -1070,20 +1126,43 @@ function pushbuttonHE_ButtonDownFcn(hObject, eventdata, handles)
 end
 % *************************************************************************
 
-% --- Executes on button press in pushbuttonRegistration.
-function pushbuttonRegistration_Callback(hObject, eventdata, handles)
-% hObject    handle to pushbuttonRegistration (see GCBO)
+% --- Executes on button press in pushbuttonAffRegistration.
+function pushbuttonAffRegistration_Callback(hObject, eventdata, handles)
+% When the push button pushbuttonAffRegistration is pressed, the image
+% (histology or MRI) is registered to the other with an affine
+% registration. Then, the new image is shown in the axes. Finally, the
+% user is given the opportunity to save the image. The points in the
+% corresponding table are also transformed and changed accordingly
+%
+% hObject    handle to pushbuttonAffRegistration (see GCBO)
 % eventdata  reserved - to be defined in a future version of MATLAB
 % handles    structure with handles and user data (see GUIDATA)
 
-
-    % NEED TO CHECK IF THERE ARE POINTS LOADED
-    % NEED TO CHECK IF THERE ARE AT LEAST AN MRI IMAGE LOADED
-    % NEED TO CHECK IF THE HISTOLOGY IMAGE HAS BEEN LOADAD
     
     % Get data stored in axes1
     dataHandles = guidata(handles.axes1);
+    valueHistology = 1;
     
+    % NEED TO CHECK IF THERE ARE POINTS LOADED
+    if(isempty(dataHandles.data.tableCoordinatesMRI) || isempty(dataHandles.data.tableCoordinatesHistol))
+        errordlg('You must have some points loaded before affine registration ', 'Error Affine registration');
+        return;
+    end
+    
+    % NEED TO CHECK IF THERE ARE AT LEAST AN MRI IMAGE LOADED
+    indexesMRI = find(~cellfun(@isempty,dataHandles.data.MRIImage(:)));
+    if(isempty(indexesMRI) || isempty(dataHandles.data.histologyImage{1}))
+        errordlg('You must load the MRI and the Histology image before affine registation', 'Error Affine registration');
+        return;
+    end
+    
+    % NEED TO CHECK IF THE HISTOLOGY IMAGE HAS BEEN LOADAD
+    indexesHistol = find(~cellfun(@isempty,dataHandles.data.histologyImage(:)));
+    if(isempty(indexesHistol) || isempty(dataHandles.data.histologyImage{1}))
+        errordlg('You must load the MRI and the Histology image before affine registation', 'Error Affine registration');
+        return;
+    end
+        
     % Get what kind of registration to carry out: Histology to MRI or MRI
     % to Histology
     hist2MRI = false;
@@ -1104,33 +1183,320 @@ function pushbuttonRegistration_Callback(hObject, eventdata, handles)
     sizeHistolImageGUI = size(dataHandles.data.histologyImage{1});
 %     sizeHistolImageOri = dataHandles.data.histologyImage{3};
 %     pathHistolImage = dataHandles.data.histologyImage{2};
-    histolImageOri = imread(dataHandles.data.histologyImage{2});
-    histolImage = imresize(histolImageOri, 0.5);
+    histolImage = imread(dataHandles.data.histologyImage{2});
+    % TRY WITH THE ORIGINAL IMAGE SIZE
+    histolImage = imresize(histolImage, 0.5);
     clear histolImageOri;
     
-    %imReg = fRegBSpline(pointsMRI, pointsHistology, imagesMRI, sizeHistolImage, sizeHistolImageOri, pathHistolImage, hist2MRI);
-    [imRegBSpline, imRegAffine] = fRegBSpline(pointsMRI, pointsHistology, imagesMRI, sizeHistolImageGUI, histolImage, hist2MRI);
+    [imRegAffine, pointsReg] = fRegAffine(pointsMRI, pointsHistology, imagesMRI, sizeHistolImageGUI, histolImage, hist2MRI);
     
-    %Show both registered images
-    if(hist2MRI)
-        figure; 
-        subplot(1,2,1); imshow(imRegBSpline); title('B-Spline registration');
-        subplot(1,2,2); imshow(imRegAffine); title('Affine registration');
-    else
-        figure; 
-        subplot(4,2,1); imshow(imRegBSpline{1}); title('B-Spline registration FLAIR');
-        subplot(4,2,2); imshow(imRegAffine{1}); title('Affine registration FLAIR');
-        subplot(4,2,3); imshow(imRegBSpline{2}); title('B-Spline registration T1');
-        subplot(4,2,4); imshow(imRegAffine{2}); title('Affine registration T1');
-        subplot(4,2,5); imshow(imRegBSpline{3}); title('B-Spline registration T2');
-        subplot(4,2,6); imshow(imRegAffine{3}); title('Affine registration T2');
-        subplot(4,2,7); imshow(imRegBSpline{4}); title('B-Spline registration T2star');
-        subplot(4,2,8); imshow(imRegAffine{4}); title('Affine registration T2star');
+    if(hist2MRI) % IF THE HISTOLOGY IS REGISTERED TO THE MRI
+        
+        %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+        %%% 0 - SAVE THE REGISTERED IMAGE(S) IN THE HARD DISK %%%
+        %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+        [fileName, pathName, ~] = uiputfile( ...
+        {'*.jpg', 'JPG Images (*.jpg)';...
+         '*.png', 'PNG Images (*.png)';...
+         '*.bmp', 'Bitmap files (*.bmp)';...
+         '*.jpg;*.png;*.bmp', 'Image Files (*.jpg,*.png,*.bmp)'},...
+         'Save Affine registration image');
+
+        % In case the user does not select a filename.
+        if(isequal(fileName,0) && isequal(pathName,0))
+            fileName = 'AffineImage.jpg';
+            pathName = '.';
+        end
+        
+        fileNameNoExt = fileName(1:end-4);
+        fileExt = fileName(end-2:end);
+        fileNameAffine = [fileNameNoExt, '_Affine', '.', fileExt];
+        imwrite(imRegAffine, [pathName, fileNameAffine]);
+        
+        dataHandles.data.histologyImage{valueHistology,1} = imRegAffine;
+        % Store also the path of the affine registered histology image
+        dataHandles.data.histologyImage{valueHistology, 2} = [pathName, fileNameAffine];
+        dataHandles.data.histologyImage{valueHistology, 3} = size(imRegAffine);
+        
+        %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+        %%% 1- CHANGE IMAGE IN AXIS %%%
+        %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+        axes(handles.axes2);
+        
+        % Get axes2 tag
+        tag = get(handles.axes2, 'Tag');
+        
+        % Display image in axes2 using bicubic interpolation
+        hHistology = imshow(imRegAffine,[]);
+%         resizePos = get(handles.axes2, 'Position');
+%         scaleRes = resizePos(3)/max(size(imRegAffine)); % Axis is squared
+%         %imageRes = imresize(data.data.MRIImage{2,valueFLAIR}, [resizePos(4) resizePos(3)]);
+%         imageRes = imresize(imRegAffine, scaleRes, 'bicubic');
+%         hHistology = imshow(imageRes);
+        
+        % Set again the properties lost in axes1
+        set(handles.axes2, 'Tag', tag);
+        %set(handles.axes1, 'ButtonDownFcn', @axes1_ButtonDownFcn);
+        set(hHistology, 'ButtonDownFcn', {@getClicksHistology, handles});
+        
+        % Change text above the histology image panel, indicating the user
+        % to select a few points (needed to make an affine registration to 
+        % the image)
+        set(handles.text5, 'String', 'Now, select points uniformly throughout the image for the final registration.');
+        
+        %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+        %%% 2- CHANGE LIST OF POINTS AND DRAW POINTS AGAIN %%%
+        %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+        
+        % COPY THE POINTS INTO THE VARIABLE dataHandles.data.tableCoordinatesHistol
+        dataHandles.data.tableCoordinatesHistol = pointsReg;
+        
+        % COPY THE POINTS INTO THE GUI TABLES: 
+        set(handles.uitablePointsHistol, 'Data', num2cell(round(pointsReg)));
+
+        % IF THERE ARE POINTS IN THE IMAGE, REMOVE THEM AND PAINT THEM AGAIN
+        % Axes2
+        axes(handles.axes2);
+        axes2_chil = get(handles.axes2, 'Children');
+        class_axes2 = arrayfun(@class, axes2_chil, 'UniformOutput', false);
+        isImage = strcmpi('matlab.graphics.primitive.Image', class_axes2);
+        delete(axes2_chil(~isImage));
+
+        for nP_Hist=1:size(pointsReg,1)
+            coord_Hist = [pointsReg(nP_Hist,2), pointsReg(nP_Hist,1)]; %(x,y)
+            % Put a marker on the point
+            hPoint = impoint(handles.axes2, coord_Hist);
+            set(hPoint, 'UserData', nP_Hist);
+            % Construct boundary constraint function
+            fcn = makeConstrainToRectFcn('impoint', get(gca,'XLim'), get(gca,'YLim'));
+            % Enforce boundary constraint function using setPositionConstraintFcn
+            setPositionConstraintFcn(hPoint, fcn);
+            setColor(hPoint, 'b');
+            addNewPositionCallback(hPoint, @pointDragHistol);
+            %setString(hPoint, num2str(k));
+            hTxt = text(coord_Hist(1), coord_Hist(2), sprintf('%d',nP_Hist), ...
+                'Color', 'b', 'FontSize',8, ...
+                'HorizontalAlignment','left', 'VerticalAlignment','top');
+        end
+        
+        guidata(handles.axes1, dataHandles);
+        
+    else % IF THE MRI IS REGISTERED TO THE HISTOLOGY
+        
+        %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+        %%% 0 - SAVE THE REGISTERED IMAGE(S) IN THE HARD DISK %%%
+        %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+        [fileName, pathName, ~] = uiputfile( ...
+        {'*.jpg', 'JPG Images (*.jpg)';...
+         '*.png', 'PNG Images (*.png)';...
+         '*.bmp', 'Bitmap files (*.bmp)';...
+         '*.jpg;*.png;*.bmp', 'Image Files (*.jpg,*.png,*.bmp)'},...
+         'Save Affine registration image');
+
+        % In case the user does not select a filename.
+         if(isequal(fileName,0) && isequal(pathName,0))
+            fileName = 'AffineImage.jpeg';
+            pathName = '.';
+         end
+        
+        fileNameNoExt = fileName(1:end-4);
+        fileExt = fileName(end-2:end);
+        
+        % Save and store only if they were previously loaded
+        if(~isempty(dataHandles.data.MRIImage{2,1}))
+
+            imwrite(imRegAffine{1}, [pathName, fileNameNoExt, '_FLAIR_Affine', '.', fileExt]);
+            dataHandles.data.MRIImage{2,1} = imRegAffine{1};
+        end
+        if(~isempty(dataHandles.data.MRIImage{2,2}))
+            imwrite(imRegAffine{2}, [pathName, fileNameNoExt, '_T1_Affine', '.', fileExt]);
+            dataHandles.data.MRIImage{2,2} = imRegAffine{2};
+        end
+        if(~isempty(dataHandles.data.MRIImage{2,3}))
+            imwrite(imRegAffine{3}, [pathName, fileNameNoExt, '_T2_Affine', '.', fileExt]);
+            dataHandles.data.MRIImage{2,3} = imRegAffine{3};
+        end
+        if(~isempty(dataHandles.data.MRIImage{2,4}))
+            imwrite(imRegAffine{4}, [pathName, fileNameNoExt, '_T2star_Affine', '.', fileExt]);
+            dataHandles.data.MRIImage{2,4} = imRegAffine{4};
+        end
+           
+        %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+        %%% 1- CHANGE IMAGE IN AXIS %%%
+        %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+        
+        % LOOK WHICH IS THE MRI IMAGE THAT IS CURRENTLY SHOWN IN AXES 1
+        % (LOOK AT THE RADIOBUTTONS)
+        valFlair = get(handles.rbFLAIR, 'Value');
+        valT1w = get(handles.rbT1w, 'Value');
+        valT2w = get(handles.rbT2w, 'Value');
+        valT2star = get(handles.rbT2star, 'Value');
+        
+        idMRI = 0;
+        if(valFlair)
+            idMRI = 1;
+        elseif(valT1w)
+            idMRI = 2;
+        elseif(valT2w)
+            idMRI = 3;
+        elseif(valT2star)
+            idMRI = 4;
+        end
+        
+        axes(handles.axes1);
+        
+        % Get axes2 tag
+        tag = get(handles.axes1, 'Tag');
+        
+        % Display image in axes2
+        hMRI = imshow(imRegAffine{idMRI},[]);
+%         resizePos = get(handles.axes1, 'Position');
+%         scaleRes = resizePos(3)/max(size(imRegAffine{idMRI})); % Axis is squared
+%         %imageRes = imresize(data.data.MRIImage{2,valueFLAIR}, [resizePos(4) resizePos(3)]);
+%         imageRes = imresize(imRegAffine{idMRI}, scaleRes, 'bicubic');
+%         hMRI = imshow(imageRes);
+        
+        % Set again the properties lost in axes1
+        set(handles.axes1, 'Tag', tag);
+        %set(handles.axes1, 'ButtonDownFcn', @axes1_ButtonDownFcn);
+        set(hMRI, 'ButtonDownFcn', {@getClicksMRI, handles});
+        
+        % Change text above the histology image panel, indicating the user
+        % to select a few points (needed to make an affine registration to 
+        % the image)
+        set(handles.text5, 'String', 'Now, select points uniformly throughout the image for the final registration.');
+        
+        %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+        %%% 2- CHANGE LIST OF POINTS AND DRAW POINTS AGAIN %%%
+        %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+        
+        % COPY THE POINTS INTO THE VARIABLES dataHandles.data.tableCoordinatesMRI
+        dataHandles.data.tableCoordinatesMRI = pointsReg;
+        
+        % COPY THE POINTS INTO THE GUI TABLES: 
+        set(handles.uitablePointsMRI, 'Data', num2cell(round(pointsReg)));
+
+
+        % IF THERE ARE POINTS IN THE IMAGE, REMOVE THEM AND PAINT THEM AGAIN
+        axes(handles.axes1);
+        axes1_chil = get(handles.axes1, 'Children');
+        class_axes1 = arrayfun(@class, axes1_chil, 'UniformOutput', false);
+        isImage = strcmpi('matlab.graphics.primitive.Image', class_axes1);
+        delete(axes1_chil(~isImage));
+
+        for nP_MRI=1:size(pointsReg,1)
+            coord_MRI = [pointsReg(nP_MRI,2), pointsReg(nP_MRI,1)]; %(x,y)
+            % Put a marker on the point
+            hPoint = impoint(handles.axes1, coord_MRI);
+            set(hPoint, 'UserData', nP_MRI);
+            % Construct boundary constraint function
+            fcn = makeConstrainToRectFcn('impoint', get(gca,'XLim'), get(gca,'YLim'));
+            % Enforce boundary constraint function using setPositionConstraintFcn
+            setPositionConstraintFcn(hPoint, fcn);
+            setColor(hPoint, 'r');
+            addNewPositionCallback(hPoint, @pointDragMRI);
+            %setString(hPoint, num2str(k));
+            hTxt = text(coord_MRI(1), coord_MRI(2), sprintf('%d',nP_MRI), ...
+                'Color', 'r', 'FontSize',8, ...
+                'HorizontalAlignment','left', 'VerticalAlignment','top');
+        end
+
+        guidata(handles.axes1, dataHandles);
     end
     
-    choice = questdlg('Which image do you want to save?', ...
-	'Save the image', ...
-	'B-Spline', 'Affine', 'Both', 'Both');
+    set(handles.pushbuttonAffRegistration, 'Enable', 'off');
+    set(handles.pushbuttonRegistration, 'Enable', 'on');
+    set(handles.radiobutton18, 'Enable', 'off');
+    set(handles.radiobutton19, 'Enable', 'off');
+    
+end
+% *************************************************************************
+
+% --- Executes on button press in pushbuttonRegistration.
+function pushbuttonRegistration_Callback(hObject, eventdata, handles)
+% hObject    handle to pushbuttonRegistration (see GCBO)
+% eventdata  reserved - to be defined in a future version of MATLAB
+% handles    structure with handles and user data (see GUIDATA)
+
+    % Get data stored in axes1
+    dataHandles = guidata(handles.axes1);
+
+    % NEED TO CHECK IF THERE ARE POINTS LOADED
+    if(isempty(dataHandles.data.tableCoordinatesMRI) || isempty(dataHandles.data.tableCoordinatesHistol))
+        errordlg('You must have some points loaded before registration ', 'Error Affine registration');
+        return;
+    end
+    
+    % NEED TO CHECK IF THERE ARE AT LEAST AN MRI IMAGE LOADED
+    indexesMRI = find(~cellfun(@isempty,dataHandles.data.MRIImage(:)));
+    if(isempty(indexesMRI) || isempty(dataHandles.data.histologyImage{1}))
+        errordlg('You must load the MRI and the Histology image before registation', 'Error Affine registration');
+        return;
+    end
+    
+    % NEED TO CHECK IF THE HISTOLOGY IMAGE HAS BEEN LOADAD
+    indexesHistol = find(~cellfun(@isempty,dataHandles.data.histologyImage(:)));
+    if(isempty(indexesHistol) || isempty(dataHandles.data.histologyImage{1}))
+        errordlg('You must load the MRI and the Histology image before registation', 'Error Affine registration');
+        return;
+    end
+        
+    % Get what kind of registration to carry out: Histology to MRI or MRI
+    % to Histology
+    hist2MRI = false;
+    hSelectedReg = get(handles.uibuttongroupRegistration, 'SelectedObject');
+    switch get(hSelectedReg, 'Tag')
+        case 'radiobutton18'
+            hist2MRI = true;
+        case 'radiobutton19'
+            hist2MRI = false;
+    end
+    
+    % Call the registration function
+    pointsMRI = [dataHandles.data.tableCoordinatesMRI(:,1), dataHandles.data.tableCoordinatesMRI(:,2)]; %(row,col)
+    pointsHistology = [dataHandles.data.tableCoordinatesHistol(:,1), dataHandles.data.tableCoordinatesHistol(:,2)]; %(row,col)
+%     MRILoaded = ~cellfun(@isempty,dataHandles.data.MRIImage);
+    imagesMRI = dataHandles.data.MRIImage(2,:);
+    imagesMRI(cellfun(@isempty,imagesMRI)) = [];
+    sizeHistolImageGUI = size(dataHandles.data.histologyImage{1});
+%     sizeHistolImageOri = dataHandles.data.histologyImage{3};
+%     pathHistolImage = dataHandles.data.histologyImage{2};
+    % IF THE HISTOLOGY WAS AFFINE REGISTERED, USE THE AFFINE-REGISTERED 
+    % IMAGE STORED IN THE HANDLES
+    if(hist2MRI)
+        histolImage = dataHandles.data.histologyImage{1};
+    else
+        % IF THE HISTOLOGY IMAGE WAS NOT AFFINE REGISTERED, READ THE
+        % ORIGINAL IMAGE FROM THE DISK.
+        % TRY WITH THE ORIGINAL SIZE IMAGE
+        histolImage = imread(dataHandles.data.histologyImage{2});
+        histolImage = imresize(histolImage, 0.5);
+    end
+        
+    
+    %imReg = fRegBSpline(pointsMRI, pointsHistology, imagesMRI, sizeHistolImage, sizeHistolImageOri, pathHistolImage, hist2MRI);
+    imRegBSpline = fRegBSpline(pointsMRI, pointsHistology, imagesMRI, sizeHistolImageGUI, histolImage, hist2MRI);
+    
+%     %Show both registered images
+%     if(hist2MRI)
+%         figure; 
+%         subplot(1,2,1); imshow(imRegBSpline); title('B-Spline registration');
+%         subplot(1,2,2); imshow(imRegAffine); title('Affine registration');
+%     else
+%         figure; 
+%         subplot(4,2,1); imshow(imRegBSpline{1}); title('B-Spline registration FLAIR');
+%         subplot(4,2,2); imshow(imRegAffine{1}); title('Affine registration FLAIR');
+%         subplot(4,2,3); imshow(imRegBSpline{2}); title('B-Spline registration T1');
+%         subplot(4,2,4); imshow(imRegAffine{2}); title('Affine registration T1');
+%         subplot(4,2,5); imshow(imRegBSpline{3}); title('B-Spline registration T2');
+%         subplot(4,2,6); imshow(imRegAffine{3}); title('Affine registration T2');
+%         subplot(4,2,7); imshow(imRegBSpline{4}); title('B-Spline registration T2star');
+%         subplot(4,2,8); imshow(imRegAffine{4}); title('Affine registration T2star');
+%     end
+    
+%     choice = questdlg('Which image do you want to save?', ...
+% 	'Save the image', ...
+% 	'B-Spline', 'Affine', 'Both', 'Both');
     
     % Save the image
     [fileName, pathName, ~] = uiputfile( ...
@@ -1144,26 +1510,26 @@ function pushbuttonRegistration_Callback(hObject, eventdata, handles)
     fileExt = fileName(end-2:end);
     
     if(~(isequal(fileName,0) || isequal(pathName,0)))
-        if(strcmpi(choice,'B-Spline') || strcmpi(choice, 'Both'))
-            if(hist2MRI)
-                imwrite(imRegBSpline, [pathName, fileNameNoExt, '_BSpline', '.', fileExt]);
-            else
-                imwrite(imRegBSpline{1}, [pathName, fileNameNoExt, '_FLAIR_BSpline', '.', fileExt]);
-                imwrite(imRegBSpline{2}, [pathName, fileNameNoExt, '_T1_BSpline', '.', fileExt]);
-                imwrite(imRegBSpline{3}, [pathName, fileNameNoExt, '_T2_BSpline', '.', fileExt]);
-                imwrite(imRegBSpline{4}, [pathName, fileNameNoExt, '_T2star_BSpline', '.', fileExt]);
-            end
+%         if(strcmpi(choice,'B-Spline') || strcmpi(choice, 'Both'))
+        if(hist2MRI)
+            imwrite(imRegBSpline, [pathName, fileNameNoExt, '_BSpline', '.', fileExt]);
+        else
+            imwrite(imRegBSpline{1}, [pathName, fileNameNoExt, '_FLAIR_BSpline', '.', fileExt]);
+            imwrite(imRegBSpline{2}, [pathName, fileNameNoExt, '_T1_BSpline', '.', fileExt]);
+            imwrite(imRegBSpline{3}, [pathName, fileNameNoExt, '_T2_BSpline', '.', fileExt]);
+            imwrite(imRegBSpline{4}, [pathName, fileNameNoExt, '_T2star_BSpline', '.', fileExt]);
         end
-        if(strcmpi(choice,'Affine') || strcmpi(choice, 'Both'))
-            if(hist2MRI)
-                imwrite(imRegAffine, [pathName, fileNameNoExt, '_Affine', '.', fileExt]);
-            else
-                imwrite(imRegAffine{1}, [pathName, fileNameNoExt, '_FLAIR_Affine', '.', fileExt]);
-                imwrite(imRegAffine{2}, [pathName, fileNameNoExt, '_T1_Affine', '.', fileExt]);
-                imwrite(imRegAffine{3}, [pathName, fileNameNoExt, '_T2_Affine', '.', fileExt]);
-                imwrite(imRegAffine{4}, [pathName, fileNameNoExt, '_T2star_Affine', '.', fileExt]);
-            end
-        end
+%         end
+%         if(strcmpi(choice,'Affine') || strcmpi(choice, 'Both'))
+%             if(hist2MRI)
+%                 imwrite(imRegAffine, [pathName, fileNameNoExt, '_Affine', '.', fileExt]);
+%             else
+%                 imwrite(imRegAffine{1}, [pathName, fileNameNoExt, '_FLAIR_Affine', '.', fileExt]);
+%                 imwrite(imRegAffine{2}, [pathName, fileNameNoExt, '_T1_Affine', '.', fileExt]);
+%                 imwrite(imRegAffine{3}, [pathName, fileNameNoExt, '_T2_Affine', '.', fileExt]);
+%                 imwrite(imRegAffine{4}, [pathName, fileNameNoExt, '_T2star_Affine', '.', fileExt]);
+%             end
+%         end
     end
     
 end
@@ -1365,3 +1731,5 @@ function pushbuttonLoadPoints_ButtonDownFcn(hObject, eventdata, handles)
 % eventdata  reserved - to be defined in a future version of MATLAB
 % handles    structure with handles and user data (see GUIDATA)
 end
+% *************************************************************************
+
