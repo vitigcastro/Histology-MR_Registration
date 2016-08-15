@@ -26,7 +26,7 @@ function varargout = Register_PM_MRI(varargin)
 
     % Edit the above text to modify the response to help Register_PM_MRI
 
-    % Last Modified by GUIDE v2.5 07-Jun-2016 10:57:37
+    % Last Modified by GUIDE v2.5 15-Aug-2016 16:26:04
 
     % Begin initialization code - DO NOT EDIT
     gui_Singleton = 1;
@@ -123,7 +123,9 @@ function Register_PM_MRI_OpeningFcn(hObject, eventdata, handles, varargin)
         dataTableHistol(1,:) = [];
     end
     set(handles.uitablePointsHistol, 'Data', dataTableHistol);
-        
+    
+    % Put actual directory path in edit3 
+    set(handles.edit3, 'String', pwd);
 end
 % *************************************************************************
 
@@ -182,13 +184,17 @@ function buttonFLAIR_Callback(hObject, eventdata, handles)
 
     valueFLAIR = 1;
 
+    % GET WORKING DIRECTORY
+    workDir = get(handles.edit3, 'String');
+    
     % Get MRI file name
     [fileImage, pathImage] = uigetfile({'*.dcm;*.jpg;*.jpeg',...
     'Image Files (*.dcm,*.jpg,*.jpeg)';
     '*.dcm',  'DICOM (*.dcm)'; ...
     '*.jpg;*.jpeg','JPEG image (*.jpg;*.jpeg)'; ...
     '*.*',  'All Files (*.*)'}, ...
-    'Choose the FLAIR image');
+    'Choose the FLAIR image', ...
+    workDir);
         
     % READ IMAGE FILE 
     try
@@ -260,13 +266,17 @@ function buttonT1w_Callback(hObject, eventdata, handles)
 
     valueT1w = 2;
     
+    % GET WORKING DIRECTORY
+    workDir = get(handles.edit3, 'String');
+    
     % Get MRI file name
     [fileImage, pathImage] = uigetfile({'*.dcm;*.jpg;*.jpeg',...
     'Image Files (*.dcm,*.jpg,*.jpeg)';
     '*.dcm',  'DICOM (*.dcm)'; ...
     '*.jpg;*.jpeg','JPEG image (*.jpg;*.jpeg)'; ...
     '*.*',  'All Files (*.*)'}, ...
-    'Choose the T1w image');
+    'Choose the T1w image', ...
+    workDir);
         
     % READ IMAGE FILE 
     try
@@ -363,13 +373,17 @@ function buttonT2w_Callback(hObject, eventdata, handles)
 
     valueT2w = 3;
     
+    % GET WORKING DIRECTORY
+    workDir = get(handles.edit3, 'String');
+    
     % Get MRI file name
     [fileImage, pathImage] = uigetfile({'*.dcm;*.jpg;*.jpeg',...
     'Image Files (*.dcm,*.jpg,*.jpeg)';
     '*.dcm',  'DICOM (*.dcm)'; ...
     '*.jpg;*.jpeg','JPEG image (*.jpg;*.jpeg)'; ...
     '*.*',  'All Files (*.*)'}, ...
-    'Choose the T2w image');
+    'Choose the T2w image', ...
+    workDir);
         
     % READ IMAGE FILE 
     try
@@ -467,13 +481,17 @@ function buttonT2star_Callback(hObject, eventdata, handles)
 
     valueT2star = 4;
     
+    % GET WORKING DIRECTORY
+    workDir = get(handles.edit3, 'String');
+    
     % Get MRI file name
     [fileImage, pathImage] = uigetfile({'*.dcm;*.jpg;*.jpeg',...
     'Image Files (*.dcm,*.jpg,*.jpeg)';
     '*.dcm',  'DICOM (*.dcm)'; ...
     '*.jpg;*.jpeg','JPEG image (*.jpg;*.jpeg)'; ...
     '*.*',  'All Files (*.*)'}, ...
-    'Choose the T2star image');
+    'Choose the T2star image', ...
+    workDir);
         
     % READ IMAGE FILE 
     try
@@ -570,13 +588,17 @@ function pushbuttonHE_Callback(hObject, eventdata, handles)
 
     valueHistology = 1;
     
+    % GET WORKING DIRECTORY
+    workDir = get(handles.edit3, 'String');
+    
     % Get MRI file name
     [fileImage, pathImage] = uigetfile({'*.jpg;*.jpeg;*.png',...
     'Image Files (*.jpg,*.jpeg,*.png)';
     '*.jpg;*.jpeg','JPEG image (*.jpg;*.jpeg)'; ...
     '*.png',  'Portable Network Graphics (*.png)'; ...
     '*.*',  'All Files (*.*)'}, ...
-    'Choose the H&E histology image');
+    'Choose the H&E histology image', ...
+    workDir);
 
     try
         % Load image
@@ -636,6 +658,46 @@ function pushbuttonHE_Callback(hObject, eventdata, handles)
         set(handles.radiobutton18, 'Enable', 'on');
         set(handles.radiobutton19, 'Enable', 'on');
         
+        %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+        %%%%% DELETE ALL POINTS FROM TABLES AND AXES, IF ANY %%%%%
+        %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+        
+        % 1 - DELETE FROM TABLES IN AXES
+        % Get the table with the points from handles.axis1
+        dataHandles = guidata(handles.axes1);
+    
+        % Copy an empty matrix into dataHandles.data.tableCoordinatesMRI
+        % and dataHandles.data.tableCoordinatesHistol
+        dataHandles.data.tableCoordinatesMRI = [];
+        dataHandles.data.tableCoordinatesHistol = [];
+    
+        % Save the points into handles.axis1
+        guidata(handles.axes1, dataHandles);
+        
+        % 2 - REMOVE FROM GUI TABLES
+        set(handles.uitablePointsMRI, 'Data', []);
+        set(handles.uitablePointsHistol, 'Data', []);
+    
+        % 3 - DELETE FROM IMAGES AXES
+        % If there are po THERE ARE POINTS IN THE IMAGE, REMOVE THEM AND PAINT THEM AGAIN
+        % Axes1
+        axes(handles.axes1);
+        axes1_chil = get(handles.axes1, 'Children');
+        class_axes1 = arrayfun(@class, axes1_chil, 'UniformOutput', false);
+        isImage = strcmpi('matlab.graphics.primitive.Image', class_axes1);
+        delete(axes1_chil(~isImage));
+
+        % Axes2
+        axes(handles.axes2);
+        axes2_chil = get(handles.axes2, 'Children');
+        class_axes2 = arrayfun(@class, axes2_chil, 'UniformOutput', false);
+        isImage = strcmpi('matlab.graphics.primitive.Image', class_axes2);
+        delete(axes2_chil(~isImage));
+
+        %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+        %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+        %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+        
     catch
         errordlg('Choose a JPEG image', 'Error reading the image');
     end
@@ -649,7 +711,9 @@ function pushbuttonSavePoints_Callback(hObject, eventdata, handles)
 % eventdata  reserved - to be defined in a future version of MATLAB
 % handles    structure with handles and user data (see GUIDATA)
 
-
+    % GET WORKING DIRECTORY
+    workDir = get(handles.edit3, 'String');
+    
     % Get the table with the points
     dataHandles = guidata(handles.axes1);
     
@@ -657,7 +721,7 @@ function pushbuttonSavePoints_Callback(hObject, eventdata, handles)
     pointsHistol = dataHandles.data.tableCoordinatesHistol;
     
     % Select file name to save the points
-    uisave({'pointsMRI','pointsHistol'}, 'Points.mat');
+    uisave({'pointsMRI','pointsHistol'}, fullfile(workDir, 'Points.mat'));
     
 end
 % *************************************************************************
@@ -674,11 +738,14 @@ function pushbuttonLoadPoints_Callback(hObject, eventdata, handles)
 %     set(handles.uitablePointsMRI, 'CellSelectionCallback', '');
 %     set(handles.uitablePointsHistol, 'CellSelectionCallback', '');
     
+    % GET WORKING DIRECTORY
+    workDir = get(handles.edit3, 'String');
+    
     % GET THE MAT FILE WITH THE POINTS AND LOAD IT
-    [filePoints, pathPoints] = uigetfile({'*.mat',...
-    'Mat Files (*.mat)';
-    '*.*',  'All Files (*.*)'}, ...
-    'Select a file to save the points');
+    [filePoints, pathPoints] = uigetfile({'*.mat', 'Mat Files (*.mat)';
+    fullfile(workDir,'*.*'),  'All Files (*.*)'}, ...
+    'Select a file to save the points', ...
+    workDir);
     
     if(filePoints==0)
         errordlg('File not found','File Error');
@@ -1138,7 +1205,9 @@ function pushbuttonAffRegistration_Callback(hObject, eventdata, handles)
 % eventdata  reserved - to be defined in a future version of MATLAB
 % handles    structure with handles and user data (see GUIDATA)
 
-    
+    % GET WORKING DIRECTORY
+    workDir = get(handles.edit3, 'String');
+
     % Get data stored in axes1
     dataHandles = guidata(handles.axes1);
     valueHistology = 1;
@@ -1200,7 +1269,8 @@ function pushbuttonAffRegistration_Callback(hObject, eventdata, handles)
          '*.png', 'PNG Images (*.png)';...
          '*.bmp', 'Bitmap files (*.bmp)';...
          '*.jpg;*.png;*.bmp', 'Image Files (*.jpg,*.png,*.bmp)'},...
-         'Save Affine registration image');
+         'Save Affine registration image', ...
+         workDir);
 
         % In case the user does not select a filename.
         if(isequal(fileName,0) && isequal(pathName,0))
@@ -1291,7 +1361,8 @@ function pushbuttonAffRegistration_Callback(hObject, eventdata, handles)
          '*.png', 'PNG Images (*.png)';...
          '*.bmp', 'Bitmap files (*.bmp)';...
          '*.jpg;*.png;*.bmp', 'Image Files (*.jpg,*.png,*.bmp)'},...
-         'Save Affine registration image');
+         'Save Affine registration image', ...
+         workDir);
 
         % In case the user does not select a filename.
          if(isequal(fileName,0) && isequal(pathName,0))
@@ -1418,6 +1489,9 @@ function pushbuttonRegistration_Callback(hObject, eventdata, handles)
 % eventdata  reserved - to be defined in a future version of MATLAB
 % handles    structure with handles and user data (see GUIDATA)
 
+    % GET WORKING DIRECTORY
+    workDir = get(handles.edit3, 'String');
+
     % Get data stored in axes1
     dataHandles = guidata(handles.axes1);
 
@@ -1504,7 +1578,8 @@ function pushbuttonRegistration_Callback(hObject, eventdata, handles)
      '*.png', 'PNG Images (*.png)';...
      '*.bmp', 'Bitmap files (*.bmp)';...
      '*.jpg;*.png;*.bmp', 'Image Files (*.jpg,*.png,*.bmp)'},...
-     'Save registered images');
+     'Save registered images', ...
+     workDir);
     
     fileNameNoExt = fileName(1:end-4);
     fileExt = fileName(end-2:end);
@@ -1733,3 +1808,45 @@ function pushbuttonLoadPoints_ButtonDownFcn(hObject, eventdata, handles)
 end
 % *************************************************************************
 
+function edit3_Callback(hObject, eventdata, handles)
+% hObject    handle to edit3 (see GCBO)
+% eventdata  reserved - to be defined in a future version of MATLAB
+% handles    structure with handles and user data (see GUIDATA)
+
+    % Hints: get(hObject,'String') returns contents of edit3 as text
+    %        str2double(get(hObject,'String')) returns contents of edit3 as a double
+
+end
+% *************************************************************************
+
+% --- Executes during object creation, after setting all properties.
+function edit3_CreateFcn(hObject, eventdata, handles)
+% hObject    handle to edit3 (see GCBO)
+% eventdata  reserved - to be defined in a future version of MATLAB
+% handles    empty - handles not created until after all CreateFcns called
+
+    % Hint: edit controls usually have a white background on Windows.
+    %       See ISPC and COMPUTER.
+    if ispc && isequal(get(hObject,'BackgroundColor'), get(0,'defaultUicontrolBackgroundColor'))
+        set(hObject,'BackgroundColor','white');
+    end
+end
+% *************************************************************************
+
+% --- Executes on button press in pushbutton17.
+function pushbutton17_Callback(hObject, eventdata, handles)
+% hObject    handle to pushbutton17 (see GCBO)
+% eventdata  reserved - to be defined in a future version of MATLAB
+% handles    structure with handles and user data (see GUIDATA)
+
+    % Get the current working directory
+    currentWorkDir = get(handles.edit3, 'String');
+    
+    % Choose a new directory
+    folderName = uigetdir(currentWorkDir, 'Choose working directory');
+    
+    % Set the new working directory in edit3
+    set(handles.edit3, 'String', folderName);
+
+end
+% *************************************************************************
