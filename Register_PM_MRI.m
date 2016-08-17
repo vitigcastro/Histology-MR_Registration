@@ -1255,9 +1255,9 @@ function pushbuttonAffRegistration_Callback(hObject, eventdata, handles)
     sizeHistolImageGUI = size(dataHandles.data.histologyImage{1});
 %     sizeHistolImageOri = dataHandles.data.histologyImage{3};
 %     pathHistolImage = dataHandles.data.histologyImage{2};
-    histolImage = imread(dataHandles.data.histologyImage{2});
-    % TRY WITH THE ORIGINAL IMAGE SIZE
-    histolImage = imresize(histolImage, 0.5);
+    %histolImage = imread(dataHandles.data.histologyImage{2});
+    %histolImage = imresize(histolImage, 0.5);
+    histolImage = dataHandles.data.histologyImage{1};
     clear histolImageOri;
     
     [imRegAffine, pointsReg] = fRegAffine(pointsMRI, pointsHistology, imagesMRI, sizeHistolImageGUI, histolImage, hist2MRI);

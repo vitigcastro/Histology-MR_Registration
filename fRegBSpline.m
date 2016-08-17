@@ -36,16 +36,22 @@ function imageRegBSpline = fRegBSpline(pointsMRI, pointsHistology, imagesMRI, si
     % size to get (approximately) the original histology image)
     ratX = sizeHistolImage(2)/sizeMRIImage(2);
     ratY = sizeHistolImage(1)/sizeMRIImage(1);
-    ratio = mean([ratX, ratY]);
+    %ratio = mean([ratX, ratY]);
     
     % Ratio to resize GUI Histology to original histology
     %ratioHistol = sizeHistolImage(1)/sizeHistolImageGUI(1);
-    ratioHistol = mean([sizeHistolImage(1)/sizeHistolImageGUI(1), sizeHistolImage(2)/sizeHistolImageGUI(2)]);
+    %ratioHistol = mean([sizeHistolImage(1)/sizeHistolImageGUI(1), sizeHistolImage(2)/sizeHistolImageGUI(2)]);
+    ratioHistolX = sizeHistolImage(2)/sizeHistolImageGUI(2);
+    ratioHistolY = sizeHistolImage(1)/sizeHistolImageGUI(1);
 
     % IF THE REGISTRATION IS HISTOLOGY -> MRI, RESIZE MRI POINTS
     if(hist2MRI)
-        pointsHistology = pointsHistology*ratioHistol;
-        pointsMRI = pointsMRI*ratio;
+        pointsHistology(:,1) = pointsHistology*ratioHistolY;
+        pointsHistology(:,2) = pointsHistology*ratioHistolX;
+        %pointsMRI = pointsMRI*ratio;
+        pointsMRI(:,1) = pointsMRI(:,1)*ratY; % rows == y
+        pointsMRI(:,2) = pointsMRI(:,2)*ratX; % cols == x
+        
         %imageHistology = imread(pathHistolImage);
         options.Verbose = true;
         options.MaxRef = 10;
@@ -112,7 +118,9 @@ function imageRegBSpline = fRegBSpline(pointsMRI, pointsHistology, imagesMRI, si
     else % IF THE REGISTRATION IS MRI -> HISTOLOGY, RESIZE MRI POINTS
         imageRegBSpline = cell(size(imagesMRI));
         %imageRegAffine = cell(size(imagesMRI));
-        pointsHistology = (pointsHistology*ratioHistol)/ratio; 
+        %pointsHistology = (pointsHistology*ratioHistol)/ratio; 
+        pointsHistology(:,1) = (pointsHistology(:,1)*ratioHistolY)/ratY; % rows == y 
+        pointsHistology(:,2) = (pointsHistology(:,2)*ratioHistolX)/ratX; % cols == x
         
 %         %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %         %%%%%%% FIRST: Affine registration %%%%%%%
