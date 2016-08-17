@@ -36,7 +36,7 @@ function imageRegBSpline = fRegBSpline(pointsMRI, pointsHistology, imagesMRI, si
     % size to get (approximately) the original histology image)
     ratX = sizeHistolImage(2)/sizeMRIImage(2);
     ratY = sizeHistolImage(1)/sizeMRIImage(1);
-    %ratio = mean([ratX, ratY]);
+    ratio = mean([ratX, ratY]);
     
     % Ratio to resize GUI Histology to original histology
     %ratioHistol = sizeHistolImage(1)/sizeHistolImageGUI(1);
@@ -46,11 +46,11 @@ function imageRegBSpline = fRegBSpline(pointsMRI, pointsHistology, imagesMRI, si
 
     % IF THE REGISTRATION IS HISTOLOGY -> MRI, RESIZE MRI POINTS
     if(hist2MRI)
-        pointsHistology(:,1) = pointsHistology*ratioHistolY;
-        pointsHistology(:,2) = pointsHistology*ratioHistolX;
-        %pointsMRI = pointsMRI*ratio;
-        pointsMRI(:,1) = pointsMRI(:,1)*ratY; % rows == y
-        pointsMRI(:,2) = pointsMRI(:,2)*ratX; % cols == x
+        pointsHistology(:,1) = pointsHistology(:,1)*ratioHistolY;
+        pointsHistology(:,2) = pointsHistology(:,2)*ratioHistolX;
+        pointsMRI = pointsMRI*ratio;
+        %pointsMRI(:,1) = pointsMRI(:,1)*ratY; % rows == y
+        %pointsMRI(:,2) = pointsMRI(:,2)*ratX; % cols == x
         
         %imageHistology = imread(pathHistolImage);
         options.Verbose = true;
@@ -119,8 +119,8 @@ function imageRegBSpline = fRegBSpline(pointsMRI, pointsHistology, imagesMRI, si
         imageRegBSpline = cell(size(imagesMRI));
         %imageRegAffine = cell(size(imagesMRI));
         %pointsHistology = (pointsHistology*ratioHistol)/ratio; 
-        pointsHistology(:,1) = (pointsHistology(:,1)*ratioHistolY)/ratY; % rows == y 
-        pointsHistology(:,2) = (pointsHistology(:,2)*ratioHistolX)/ratX; % cols == x
+        pointsHistology(:,1) = (pointsHistology(:,1)*ratioHistolY)/ratio; % rows == y 
+        pointsHistology(:,2) = (pointsHistology(:,2)*ratioHistolX)/ratio; % cols == x
         
 %         %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %         %%%%%%% FIRST: Affine registration %%%%%%%
