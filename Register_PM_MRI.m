@@ -26,7 +26,7 @@ function varargout = Register_PM_MRI(varargin)
 
     % Edit the above text to modify the response to help Register_PM_MRI
 
-    % Last Modified by GUIDE v2.5 15-Aug-2016 16:26:04
+    % Last Modified by GUIDE v2.5 16-Aug-2016 17:53:25
 
     % Begin initialization code - DO NOT EDIT
     gui_Singleton = 1;
@@ -604,9 +604,12 @@ function pushbuttonHE_Callback(hObject, eventdata, handles)
         % Load image
         imageHistology = imread([pathImage, fileImage]);
         
-        % Resize image (TEST: Set scale to 0.25 (i.e. 1/4 of the original
+%         % Resize image (TEST: Set scale to 0.25 (i.e. 1/4 of the original
+%         % size))
+        %imageHistologyResize = imresize(imageHistology, 0.25);
+        % Resize image (TEST: Set scale to 0.5 (i.e. 1/2 of the original
         % size))
-        imageHistologyResize = imresize(imageHistology, 0.25);
+        imageHistologyResize = imresize(imageHistology, 0.5);
         sizeHistol = size(imageHistology);
         clear imageHistology;
         
@@ -1610,6 +1613,162 @@ function pushbuttonRegistration_Callback(hObject, eventdata, handles)
 end
 % *************************************************************************
 
+% --- Executes on button press in pushbuttonWorkDir.
+function pushbuttonWorkDir_Callback(hObject, eventdata, handles)
+% hObject    handle to pushbuttonWorkDir (see GCBO)
+% eventdata  reserved - to be defined in a future version of MATLAB
+% handles    structure with handles and user data (see GUIDATA)
+
+    % Get the current working directory
+    currentWorkDir = get(handles.edit3, 'String');
+    
+    % Choose a new directory
+    folderName = uigetdir(currentWorkDir, 'Choose working directory');
+    
+    % Set the new working directory in edit3
+    set(handles.edit3, 'String', folderName);
+
+end
+% *************************************************************************
+
+
+% --- Executes on button press in pushbuttonDetailedSelec.
+function pushbuttonDetailedSelec_Callback(hObject, eventdata, handles)
+% hObject    handle to pushbuttonDetailedSelec (see GCBO)
+% eventdata  reserved - to be defined in a future version of MATLAB
+% handles    structure with handles and user data (see GUIDATA)
+
+    % Get data from handles
+    dataHandles = guidata(handles.axes1);
+    
+    % CHECK IF ANY MRI IMAGE HAS BEEN LOADED
+    indexesMRI = find(~cellfun(@isempty,dataHandles.data.MRIImage(:)));
+    if(isempty(indexesMRI) || isempty(dataHandles.data.histologyImage{1}))
+        errordlg('You must load the MRI and the Histology image before selecting any points', 'Error images loaded');
+        return;
+    end
+    
+    % Take fixed image (MR currently selected)
+    % LOOK WHICH IS THE MRI IMAGE THAT IS CURRENTLY SHOWN IN AXES 1
+    % (LOOK AT THE RADIOBUTTONS)
+    valFlair = get(handles.rbFLAIR, 'Value');
+    valT1w = get(handles.rbT1w, 'Value');
+    valT2w = get(handles.rbT2w, 'Value');
+    valT2star = get(handles.rbT2star, 'Value');
+
+    vectorValsMR = [valFlair, valT1w, valT2w, valT2star];
+        
+    imMR = dataHandles.data.MRIImage{2, find(vectorValsMR)};
+    
+    % Take histology
+    imHistology = dataHandles.data.histologyImage{1};
+    
+    % Take fixed points (MR)
+    % BE CAREFUL! THE POINTS IN THE TABLES ARE IN FORMAT (rox,col) WHEREAS
+    % THE cpselect FUNCTION WANTS THEM AS (x,y)
+    if(~isempty(dataHandles.data.tableCoordinatesMRI))
+        pointsMRI = [dataHandles.data.tableCoordinatesMRI(:,2), dataHandles.data.tableCoordinatesMRI(:,1)]; %(x,y)
+    else
+        pointsMRI = [];
+    end
+    
+    % Take moving points (Histology)
+    if(~isempty(dataHandles.data.tableCoordinatesHistol))
+        pointsHistol = [dataHandles.data.tableCoordinatesHistol(:,2), dataHandles.data.tableCoordinatesHistol(:,1)]; %(x,y)
+    else
+        pointsHistol = [];
+    end
+    
+    % Call cpselect (and get the new points)
+    if(~isempty(pointsMRI) && ~isempty(pointsHistol))
+        [pointsMRINew, pointsHistolNew] = cpselect(imMR, imHistology, pointsMRI, pointsHistol, 'Wait', true);
+    else
+        [pointsMRINew, pointsHistolNew] = cpselect(imMR, imHistology, 'Wait', true);
+    end
+    
+    % IF THE MRI POINTS CHANGED...
+    if(~isequal(pointsMRINew, pointsMRI))
+        % Copy points
+        pointsMRI = pointsMRINew;
+        
+        % Copy points into tables stored in handles
+        dataHandles.data.tableCoordinatesMRI = [pointsMRI(:,2), pointsMRI(:,1)]; % (row, col)
+        
+        % Save the points into the axes
+        guidata(handles.axes1, dataHandles);
+                
+        % COPY THE POINTS INTO THE GUI TABLES: 
+        newDataTableMRI = num2cell(round([pointsMRI(:,2), pointsMRI(:,1)]));
+        set(handles.uitablePointsMRI, 'Data', newDataTableMRI);
+        
+        % Remove points from handles and draw them again
+        axes(handles.axes1);
+        axes1_chil = get(handles.axes1, 'Children');
+        class_axes1 = arrayfun(@class, axes1_chil, 'UniformOutput', false);
+        isImage = strcmpi('matlab.graphics.primitive.Image', class_axes1);
+        delete(axes1_chil(~isImage));
+
+        for nP_MRI=1:size(pointsMRI,1)
+            coord_MRI = [pointsMRI(nP_MRI,1), pointsMRI(nP_MRI,2)]; %(x,y)
+            % Put a marker on the point
+            hPoint = impoint(handles.axes1, coord_MRI);
+            set(hPoint, 'UserData', nP_MRI);
+            % Construct boundary constraint function
+            fcn = makeConstrainToRectFcn('impoint', get(gca,'XLim'), get(gca,'YLim'));
+            % Enforce boundary constraint function using setPositionConstraintFcn
+            setPositionConstraintFcn(hPoint, fcn);
+            setColor(hPoint, 'r');
+            addNewPositionCallback(hPoint, @pointDragMRI);
+            %setString(hPoint, num2str(k));
+            hTxt = text(coord_MRI(1), coord_MRI(2), sprintf('%d',nP_MRI), ...
+                'Color', 'r', 'FontSize',8, ...
+                'HorizontalAlignment','left', 'VerticalAlignment','top');
+        end
+    end
+    
+     % IF THE HISTOLOGY POINTS CHANGED...
+    if(~isequal(pointsHistolNew, pointsHistol))
+        % Copy points
+        pointsHistol = pointsHistolNew;
+        
+        % Copy points into tables stored in handles
+        dataHandles.data.tableCoordinatesHistol = [pointsHistol(:,2), pointsHistol(:,1)]; % (row, col)
+
+        % Save the points into the axes
+        guidata(handles.axes1, dataHandles);
+
+        % COPY THE POINTS INTO THE GUI TABLES: 
+        newDataTableHistol = num2cell(round([pointsHistol(:,2), pointsHistol(:,1)]));
+        set(handles.uitablePointsHistol, 'Data', newDataTableHistol);
+
+        % Remove points from Histology handles and draw them again
+        axes(handles.axes2);
+        axes2_chil = get(handles.axes2, 'Children');
+        class_axes2 = arrayfun(@class, axes2_chil, 'UniformOutput', false);
+        isImage = strcmpi('matlab.graphics.primitive.Image', class_axes2);
+        delete(axes2_chil(~isImage));
+
+        for nP_Hist=1:size(pointsHistol,1)
+            coord_Hist = [pointsHistol(nP_Hist,1), pointsHistol(nP_Hist,2)]; %(x,y)
+            % Put a marker on the point
+            hPoint = impoint(handles.axes2, coord_Hist);
+            set(hPoint, 'UserData', nP_Hist);
+            % Construct boundary constraint function
+            fcn = makeConstrainToRectFcn('impoint', get(gca,'XLim'), get(gca,'YLim'));
+            % Enforce boundary constraint function using setPositionConstraintFcn
+            setPositionConstraintFcn(hPoint, fcn);
+            setColor(hPoint, 'b');
+            addNewPositionCallback(hPoint, @pointDragHistol);
+            %setString(hPoint, num2str(k));
+            hTxt = text(coord_Hist(1), coord_Hist(2), sprintf('%d',nP_Hist), ...
+                'Color', 'b', 'FontSize',8, ...
+                'HorizontalAlignment','left', 'VerticalAlignment','top');
+        end
+    end
+    
+end
+% *************************************************************************
+
 % --- Executes when selected cell(s) is changed in uitablePointsMRI.
 function uitablePointsMRI_CellSelectionCallback(hObject, eventdata, handles)
 % When a cell is clicked in a table, that row is deleted in that table and
@@ -1830,23 +1989,5 @@ function edit3_CreateFcn(hObject, eventdata, handles)
     if ispc && isequal(get(hObject,'BackgroundColor'), get(0,'defaultUicontrolBackgroundColor'))
         set(hObject,'BackgroundColor','white');
     end
-end
-% *************************************************************************
-
-% --- Executes on button press in pushbutton17.
-function pushbutton17_Callback(hObject, eventdata, handles)
-% hObject    handle to pushbutton17 (see GCBO)
-% eventdata  reserved - to be defined in a future version of MATLAB
-% handles    structure with handles and user data (see GUIDATA)
-
-    % Get the current working directory
-    currentWorkDir = get(handles.edit3, 'String');
-    
-    % Choose a new directory
-    folderName = uigetdir(currentWorkDir, 'Choose working directory');
-    
-    % Set the new working directory in edit3
-    set(handles.edit3, 'String', folderName);
-
 end
 % *************************************************************************
