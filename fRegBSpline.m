@@ -29,14 +29,23 @@ function imageRegBSpline = fRegBSpline(pointsMRI, pointsHistology, imagesMRI, si
 % Funded by:    Row Fogo Charitable Trust
 %
 
-    sizeMRIImage = size(imagesMRI{1}); % There will be at least one MRI image
+    %sizeMRIImage = size(imagesMRI{1}); % There will be at least one MRI image
     sizeHistolImage = size(imageHistology);
     
     % GET THE RATIO BETWEEN IMAGES (i.e. How should we multiply the MRI
     % size to get (approximately) the original histology image)
-    ratX = sizeHistolImage(2)/sizeMRIImage(2);
-    ratY = sizeHistolImage(1)/sizeMRIImage(1);
-    ratio = mean([ratX, ratY]);
+%     ratX = sizeHistolImage(2)/sizeMRIImage(2);
+%     ratY = sizeHistolImage(1)/sizeMRIImage(1);
+%     ratio = mean([ratX, ratY]);
+    % Ratio between the distances of the 2 more distant points in histology and MRI
+    % It should be more robust than taking into account the rows and
+    % columns of the image (the image may not have the same proportion as
+    % the actual tissues)
+    dists = squareform(pdist(pointsHistology));
+    [points,~] = find(dists==max(max(dists)));
+    distPointsHistol = dists(points(1), points(2));
+    distPointsMRI = pdist2(pointsMRI(points(1),:), pointsMRI(points(2),:));
+    ratio = distPointsHistol/distPointsMRI;
     
     % Ratio to resize GUI Histology to original histology
     %ratioHistol = sizeHistolImage(1)/sizeHistolImageGUI(1);
