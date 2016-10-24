@@ -44,7 +44,8 @@ function [imgCropped, maskCrop] = segmentMR_Block(imagMRI, modality, varargin)
             
         %Convert into uint8
         imagMRI8 = uint8((double(imagMRI)./double(intmax(class(imagMRI)))).*double(intmax('uint8')));
-        imagMRI8Adj = adapthisteq(imagMRI8);
+        %imagMRI8Adj = adapthisteq(imagMRI8);
+        imagMRI8Adj = imadjust(imagMRI8);
 
         % Thresholding of the tissue sample
         %imBW = im2bw(imag8Adj, graythresh(imag8Adj)); % Otsu

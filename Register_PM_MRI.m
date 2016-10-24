@@ -26,7 +26,7 @@ function varargout = Register_PM_MRI(varargin)
 
     % Edit the above text to modify the response to help Register_PM_MRI
 
-    % Last Modified by GUIDE v2.5 16-Aug-2016 17:53:25
+    % Last Modified by GUIDE v2.5 05-Oct-2016 17:23:30
 
     % Begin initialization code - DO NOT EDIT
     gui_Singleton = 1;
@@ -87,7 +87,7 @@ function Register_PM_MRI_OpeningFcn(hObject, eventdata, handles, varargin)
     %guidata(hObject, handles);
 
     % UIWAIT makes Register_PM_MRI wait for user response (see UIRESUME)
-    % uiwait(handles.figure1);
+    % uiwait(handles.figRegistration);
     
     % Set all buttons of the MRI except for the FLAIR to invisible
     set(handles.buttonT1w, 'Visible', 'off');
