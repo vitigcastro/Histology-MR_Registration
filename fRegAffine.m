@@ -102,6 +102,8 @@ function [imageRegAffine, pointsRegAffine] = fRegAffine(pointsMRI, pointsHistolo
             pointsRegAffine(index,:) = cent;
         end
         
+        disp('Done');
+        
 %         imHist_affine2 = im2uint8(imHist_affine);
 %         for i=1:size(pointsHistologyAff,1)
 %             p = round(pointsHistologyAff(i,:));
